@@ -16,17 +16,61 @@ export async function uploadImage(file) {
   return response.json();
 }
 
-export async function sendQuestion(question, imageData) {
+export async function sendQuestion(question, imageData, chatId) {
   const response = await fetch(`${API_URL}/ask-question`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
     },
-    body: JSON.stringify({ question, image_data: imageData }),
+    body: JSON.stringify({ question, image_data: imageData, chat_id: chatId }),
   });
 
   if (!response.ok) {
     throw new Error('Failed to send question');
+  }
+
+  return response.json();
+}
+
+export async function getChatHistory(chatId) {
+  const response = await fetch(`${API_URL}/chats/${chatId}`);
+
+  if (!response.ok) {
+    throw new Error('Failed to get chat history');
+  }
+
+  return response.json();
+}
+
+export async function getChats() {
+  const response = await fetch(`${API_URL}/chats`);
+
+  if (!response.ok) {
+    throw new Error('Failed to get chats');
+  }
+
+  return response.json();
+}
+
+export async function createChat() {
+  const response = await fetch(`${API_URL}/chats`, {
+    method: 'POST',
+  });
+
+  if (!response.ok) {
+    throw new Error('Failed to create new chat');
+  }
+
+  return response.json();
+}
+
+export async function deleteChat(chatId) {
+  const response = await fetch(`${API_URL}/chats/${chatId}`, {
+    method: 'DELETE',
+  });
+
+  if (!response.ok) {
+    throw new Error('Failed to delete chat');
   }
 
   return response.json();

@@ -19,7 +19,9 @@ function ChatInput({ onSendMessage, isLoading }) {
         onChange={(e) => setInput(e.target.value)}
         placeholder="메시지를 입력하세요..."
       />
-      <button type="submit" disabled={isLoading}>전송</button>
+      <button type="submit" disabled={isLoading} className="send-button">
+        전송
+      </button>
     </form>
   );
 }
