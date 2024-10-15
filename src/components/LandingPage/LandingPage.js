@@ -34,7 +34,7 @@ function LandingPage() {
           </p>
         </div>
         <button className="start-chat-btn" onClick={handleStartChat}>
-          여행 계획 시작하기
+           여행 & 예술 탐험 시작하기
         </button>
       </div>
     </div>
