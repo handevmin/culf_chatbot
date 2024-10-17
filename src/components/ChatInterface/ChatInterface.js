@@ -65,9 +65,6 @@ function ChatInterface() {
     setIsLoading(true);
     setError(null);
     
-    setSelectedFile(null);
-    setImageData(null);
-
     const sendMessageWithRetry = async (retries = 3) => {
       try {
         const data = await sendQuestion(text, imageData, chatId);
@@ -82,6 +79,8 @@ function ChatInterface() {
         }
       } finally {
         setIsLoading(false);
+        setSelectedFile(null);
+        setImageData(null);
       }
     };
 
@@ -91,11 +90,14 @@ function ChatInterface() {
   const handleFileSelect = useCallback(async (file) => {
     setSelectedFile(file);
     try {
-      const data = await uploadImage(file);
-      setImageData(data.image_data);
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setImageData(reader.result);
+      };
+      reader.readAsDataURL(file);
     } catch (error) {
-      console.error('Error uploading image:', error);
-      setError('이미지 업로드에 실패했습니다. 다시 시도해 주세요.');
+      console.error('Error processing image:', error);
+      setError('이미지 처리에 실패했습니다. 다시 시도해 주세요.');
       setSelectedFile(null);
       setImageData(null);
     }

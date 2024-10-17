@@ -22,7 +22,11 @@ export async function sendQuestion(question, imageData, chatId) {
     headers: {
       'Content-Type': 'application/json',
     },
-    body: JSON.stringify({ question, image_data: imageData, chat_id: chatId }),
+    body: JSON.stringify({ 
+      question, 
+      image_data: imageData, 
+      chat_id: chatId 
+    }),
   });
 
   if (!response.ok) {
