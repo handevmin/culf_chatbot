@@ -57,7 +57,7 @@ function ChatInterface() {
     let newMessage = { 
       type: 'user', 
       content: { 
-        text,
+        text: text.trim(),
         image: selectedFile ? URL.createObjectURL(selectedFile) : null
       } 
     };
@@ -67,7 +67,7 @@ function ChatInterface() {
     
     const sendMessageWithRetry = async (retries = 3) => {
       try {
-        const data = await sendQuestion(text, imageData, chatId);
+        const data = await sendQuestion(text.trim(), imageData, chatId);
         setMessages(prevMessages => [...prevMessages, { type: 'bot', content: { text: data.response } }]);
       } catch (error) {
         console.error('Error sending message:', error);
@@ -120,7 +120,11 @@ function ChatInterface() {
           )}
           <div className="input-container">
             <ImageUpload onFileSelect={handleFileSelect} />
-            <ChatInput onSendMessage={handleSendMessage} isLoading={isLoading} />
+            <ChatInput 
+              onSendMessage={handleSendMessage} 
+              isLoading={isLoading} 
+              hasImage={!!selectedFile}
+            />
           </div>
         </div>
       </div>
