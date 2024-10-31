@@ -33,3 +33,5 @@ pids
 # OS-specific
 Thumbs.db
   
+code_extractor.exe
+result.txt
