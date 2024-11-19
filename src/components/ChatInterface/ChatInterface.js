@@ -3,15 +3,15 @@ import { useParams, useNavigate } from 'react-router-dom';
 import ChatHistory from './ChatHistory';
 import ChatInput from './ChatInput';
 import ImageUpload from '../ImageUpload/ImageUpload';
-import SelectedFile from './SelectedFile';
+import SelectedFiles from './SelectedFiles';
 import { uploadImage, sendQuestion, getChatHistory, createChat } from '../../services/api';
 
 function ChatInterface() {
   const { chatId } = useParams();
   const navigate = useNavigate();
   const [messages, setMessages] = useState([]);
-  const [selectedFile, setSelectedFile] = useState(null);
-  const [imageData, setImageData] = useState(null);
+  const [selectedFiles, setSelectedFiles] = useState([]);
+  const [imageDataArray, setImageDataArray] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
   const messagesEndRef = useRef(null);
@@ -52,13 +52,13 @@ function ChatInterface() {
   };
 
   const handleSendMessage = async (text) => {
-    if ((!text.trim() && !imageData) || isLoading) return;
+    if ((!text.trim() && imageDataArray.length === 0) || isLoading) return;
 
     let newMessage = { 
       type: 'user', 
       content: { 
         text: text.trim(),
-        image: selectedFile ? URL.createObjectURL(selectedFile) : null
+        images: selectedFiles ? selectedFiles.map(file => URL.createObjectURL(file)) : []
       } 
     };
     setMessages(prevMessages => [...prevMessages, newMessage]);
@@ -67,7 +67,7 @@ function ChatInterface() {
     
     const sendMessageWithRetry = async (retries = 3) => {
       try {
-        const data = await sendQuestion(text.trim(), imageData, chatId);
+        const data = await sendQuestion(text.trim(), imageDataArray, chatId);
         setMessages(prevMessages => [...prevMessages, { type: 'bot', content: { text: data.response } }]);
       } catch (error) {
         console.error('Error sending message:', error);
@@ -79,8 +79,8 @@ function ChatInterface() {
         }
       } finally {
         setIsLoading(false);
-        setSelectedFile(null);
-        setImageData(null);
+        setSelectedFiles([]);
+        setImageDataArray([]);
       }
     };
 
@@ -88,24 +88,27 @@ function ChatInterface() {
   };
 
   const handleFileSelect = useCallback(async (file) => {
-    setSelectedFile(file);
+    if (selectedFiles.length >= 5) { // 최대 5개 이미지로 제한
+      alert('최대 5개의 이미지만 업로드할 수 있습니다.');
+      return;
+    }
+
+    setSelectedFiles(prev => [...prev, file]);
     try {
       const reader = new FileReader();
       reader.onloadend = () => {
-        setImageData(reader.result);
+        setImageDataArray(prev => [...prev, reader.result]);
       };
       reader.readAsDataURL(file);
     } catch (error) {
       console.error('Error processing image:', error);
       setError('이미지 처리에 실패했습니다. 다시 시도해 주세요.');
-      setSelectedFile(null);
-      setImageData(null);
     }
-  }, []);
+  }, [selectedFiles]);
 
-  const handleRemoveFile = useCallback(() => {
-    setSelectedFile(null);
-    setImageData(null);
+  const handleRemoveFile = useCallback((index) => {
+    setSelectedFiles(prev => prev.filter((_, i) => i !== index));
+    setImageDataArray(prev => prev.filter((_, i) => i !== index));
   }, []);
 
   return (
@@ -115,15 +118,15 @@ function ChatInterface() {
         <div ref={messagesEndRef} />
         {error && <div className="error-message">{error}</div>}
         <div className="input-area">
-          {selectedFile && (
-            <SelectedFile file={selectedFile} onRemove={handleRemoveFile} />
+          {selectedFiles.length > 0 && (
+            <SelectedFiles files={selectedFiles} onRemove={handleRemoveFile} />
           )}
           <div className="input-container">
             <ImageUpload onFileSelect={handleFileSelect} />
             <ChatInput 
               onSendMessage={handleSendMessage} 
               isLoading={isLoading} 
-              hasImage={!!selectedFile}
+              hasImage={selectedFiles.length > 0}
             />
           </div>
         </div>

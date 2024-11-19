@@ -16,12 +16,17 @@ function ChatMessage({ message }) {
 
   return (
     <div className={`chat-message ${message.type}`} ref={messageRef}>
-      {message.content.image && (
-        <img 
-          src={message.content.image} 
-          alt="Uploaded" 
-          className="chat-image" 
-        />
+      {message.content.images && message.content.images.length > 0 && (
+        <div className="chat-images">
+          {message.content.images.map((image, index) => (
+            <img 
+              key={index}
+              src={image} 
+              alt={`Uploaded ${index + 1}`} 
+              className="chat-image" 
+            />
+          ))}
+        </div>
       )}
       {message.content.text && (
         <div dangerouslySetInnerHTML={{ __html: markdownToHtml(message.content.text) }} />
