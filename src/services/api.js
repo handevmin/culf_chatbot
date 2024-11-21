@@ -1,4 +1,4 @@
-const API_URL = 'http://127.0.0.1:8000';
+const API_URL = 'https://culf-test-bot-53526c2de9f6.herokuapp.com';
 
 export async function uploadImage(file) {
   const formData = new FormData();
